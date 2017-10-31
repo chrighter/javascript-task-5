@@ -80,6 +80,7 @@ lecturer
 
 // Начинаем лекцию
 lecturer.emit('begin');
+// console.info('students', students);  
 // Sam(110,50); Sally(110,60); Bill(100,55); Sharon(130,40)
 
 lecturer
@@ -87,6 +88,8 @@ lecturer
     .emit('slide.text')
     .emit('slide.text')
     .emit('slide.funny');
+
+// console.info('students', students);    
 // Sam(75,79); Sally(95,118); Bill(65,63); Sharon(120,34)
 
 lecturer
@@ -94,6 +97,7 @@ lecturer
     .emit('slide.text')
     .emit('slide.text')
     .emit('slide.funny');
+// console.info('students', students);        
 // Sam(50,90); Sally(85,155); Bill(40,62); Sharon(105,37)
 
 lecturer
@@ -103,6 +107,7 @@ lecturer
     .emit('slide.text');
 
 lecturer.emit('end');
+// console.info('students', students);
 // Sam(20,102); Sally(70,191); Bill(40,62); Sharon(90,40)
 
 if (getEmitter.isStar) {

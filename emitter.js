@@ -7,11 +7,30 @@
 getEmitter.isStar = true;
 module.exports = getEmitter;
 
+function getEvents(event) {
+    let littleEvents = [];
+    littleEvents.push(event);
+    let ind = event.lastIndexOf('.');
+    while (ind !== -1) {
+        event = event.slice(0, ind);
+        littleEvents.push(event);
+        ind = event.lastIndexOf('.');
+    }
+
+    return littleEvents;
+}
+
+function isInclude(includingEvent, includedEvent) {
+    return includingEvent.indexOf(includedEvent + '.') === 0 || includingEvent === includedEvent;
+}
+
 /**
  * Возвращает новый emitter
  * @returns {Object}
  */
 function getEmitter() {
+    let emitents = [];
+
     return {
 
         /**
@@ -19,26 +38,55 @@ function getEmitter() {
          * @param {String} event
          * @param {Object} context
          * @param {Function} handler
+         * @returns {Object}
          */
         on: function (event, context, handler) {
-            console.info(event, context, handler);
+            // сколько всего нужно вызвать, частота, текущий счетчиквызова
+            emitents.push({ event, context, handler, times: Infinity, frequency: 1,
+                currentIndex: 0 });
+
+            return this;
         },
 
         /**
          * Отписаться от события
          * @param {String} event
          * @param {Object} context
+         * @returns {Object}
          */
         off: function (event, context) {
-            console.info(event, context);
+            emitents = emitents.filter(function (emitent) {
+                if (emitent.context !== context) {
+                    return true;
+                }
+
+                return !isInclude(emitent.event, event);
+            });
+
+            return this;
         },
 
         /**
          * Уведомить о событии
          * @param {String} event
+         * @returns {Object}
          */
         emit: function (event) {
-            console.info(event);
+            const allEvents = getEvents(event);
+
+            allEvents.forEach(function (littleEvent) {
+                emitents.forEach(function (emitent) {
+                    if (emitent.event === littleEvent) {
+                        if (emitent.times > 0 && emitent.currentIndex % emitent.frequency === 0) {
+                            emitent.handler.call(emitent.context);
+                        }
+                        emitent.currentIndex += 1;
+                        emitent.times -= 1;
+                    }
+                });
+            });
+
+            return this;
         },
 
         /**
@@ -48,9 +96,12 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} times – сколько раз получить уведомление
+         * @returns {Object}
          */
         several: function (event, context, handler, times) {
-            console.info(event, context, handler, times);
+            emitents.push({ event, context, handler, times, frequency: 1, currentIndex: 0 });
+
+            return this;
         },
 
         /**
@@ -60,9 +111,12 @@ function getEmitter() {
          * @param {Object} context
          * @param {Function} handler
          * @param {Number} frequency – как часто уведомлять
+         * @returns {Object}
          */
         through: function (event, context, handler, frequency) {
-            console.info(event, context, handler, frequency);
+            emitents.push({ event, context, handler, times: Infinity, frequency, currentIndex: 0 });
+
+            return this;
         }
     };
 }
