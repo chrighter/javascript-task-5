@@ -11,7 +11,7 @@ function getEvents(event) {
     let littleEvents = [];
     littleEvents.push(event);
     let ind = event.lastIndexOf('.');
-    while (ind !== -1) {
+    while (ind >= 0) {
         event = event.slice(0, ind);
         littleEvents.push(event);
         ind = event.lastIndexOf('.');
@@ -21,7 +21,7 @@ function getEvents(event) {
 }
 
 function isInclude(includingEvent, includedEvent) {
-    return includingEvent.indexOf(includedEvent + '.') === 0 || includingEvent === includedEvent;
+    return includingEvent.startsWith(includedEvent + '.') || includingEvent === includedEvent;
 }
 
 /**
@@ -77,7 +77,7 @@ function getEmitter() {
             allEvents.forEach(function (littleEvent) {
                 emitents.forEach(function (emitent) {
                     if (emitent.event === littleEvent) {
-                        if (emitent.times > 0 && emitent.currentIndex % emitent.frequency === 0) {
+                        if (emitent.times > 0 && !(emitent.currentIndex % emitent.frequency)) {
                             emitent.handler.call(emitent.context);
                         }
                         emitent.currentIndex += 1;
